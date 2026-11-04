@@ -40,7 +40,7 @@ Notes and screenshots also work when Study Mode is off. You pressed the hotkey y
 
 - **Overzicht:** study time, number of sources and notes per internship week (week 1 = 31-08-2026).
 - **Per week, a Voortgangsrapport:** *Wat heb ik gedaan* (filled in automatically: study time, most-used sources, videos, searches, apps), *Wat heb ik geleerd*, *Feedback* and *Volgende stappen* (your ToDo notes as clickable checkboxes), plus grey *Vul aan:* prompts for the parts only you can write.
-- **Per day:** *Gesprekken met begeleider*, *Wat heb ik geleerd*, *Bevindingen*, *Open vragen & ToDo's*, *Screenshots*, and an *Activiteiten* table (tijd | activiteit | bron | duur) with clickable links.
+- **Per day:** *Gesprekken met begeleider*, *Wat heb ik geleerd*, *Bevindingen*, *Open vragen & ToDo's*, *Screenshots*, and an *Activiteiten* table (tijd | activiteit | bron | duur) with clickable links. Office rows say what you did in the file, e.g. *"Stage midterm presentatie.pptx: maakte dia's en werkte aan dia 3 'Introductie stagebedrijf' (8 min) · 14 → 15 dia's"*. The weekly *Wat heb ik gedaan* lists the same per document.
 - **AI-gebruik:** when you used which AI tool and for how long, for chapter 6 of your portfolio.
 - **Bevindingen per competentie:** your tagged notes and screenshots grouped per competency, for chapter 5.
 - **Literatuurlijst (APA 7):** with *Geraadpleegd op*. It includes pages you read for at least 1 minute, videos watched for at least 1 minute, PDFs open for at least 30 seconds, and any source you wrote a note on. Authors and dates come from the page itself, so give them a quick check.
@@ -56,6 +56,7 @@ Headings use Word's built-in heading styles (*Kop 1/2/3*), so the navigation pan
 | Search terms on Google, Google Scholar, Bing, DuckDuckGo, Wikipedia, YouTube | Anything while Study Mode is off |
 | AI tools (ChatGPT, Claude, Gemini, Copilot, Perplexity, Google AI Mode): **only which tool and how long** | Your prompts, the answers, chat titles |
 | Foreground app + window title every 5 s: Word document name, Verkenner folder path, cloud/remote desktop session name | What happens *inside* a remote/cloud desktop. Use a quick note for that. |
+| **Word / PowerPoint / Excel:** the heading your cursor is under, the slide number and title, the sheet name, how long you spent in each, and the word or slide count at the start and end. In Word this becomes, for example, *"schreef in '5.1.2 Leerproces' (12 min) · +240 woorden"* | The text you type in your documents and slides |
 | | Excluded sites and apps (default: mail, WhatsApp, social media, banks, password managers) |
 
 - Time stops counting when you switch away from Firefox, or after 2 minutes without input unless audio or video is playing. App tracking pauses after 5 minutes without input.

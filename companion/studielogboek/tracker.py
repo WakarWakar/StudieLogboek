@@ -9,6 +9,7 @@ import time
 from urllib.parse import unquote, urlsplit
 
 from . import config, winapi
+from .office import OfficeReader
 from .server import Companion
 
 log = logging.getLogger(__name__)
@@ -103,7 +104,8 @@ class WindowTracker(threading.Thread):
         super().__init__(name="tracker", daemon=True)
         self.app = app
         self.stop_event = threading.Event()
-        self.current: dict | None = None  # {sig, app, title, exe, kind, start, last}
+        self.current: dict | None = None  # {sig, app, title, exe, kind, start, last, parts, counts}
+        self.office = OfficeReader()
 
     # Called from the hotkey handler, before our own popup takes focus.
     def context_now(self) -> dict:
@@ -115,12 +117,39 @@ class WindowTracker(threading.Thread):
             return {"app": info["app"], "title": info["title"], "url": None}
         return {"app": None, "title": None, "url": None}
 
+    @staticmethod
+    def _add_details(seg: dict, details: dict | None, elapsed: float) -> None:
+        """Credit the time since the last poll to the heading/slide/sheet you are in now."""
+        # seg["parts"]: key -> [label, seconds]; the label is updated to the latest one seen
+        if not details:
+            # Office was busy (you were typing or a dialog was open): keep counting where you were
+            if seg.get("last_part") in seg["parts"]:
+                seg["parts"][seg["last_part"]][1] += max(0.0, elapsed)
+            return
+        part = details.get("part")
+        if part:
+            key = details.get("key") or part
+            entry = seg["parts"].setdefault(key, [part, 0.0])
+            entry[0] = part
+            entry[1] += max(0.0, elapsed)
+            seg["last_part"] = key
+        for count in ("words", "slides"):
+            if count in details:
+                seg.setdefault(f"{count}_start", details[count])
+                seg[f"{count}_end"] = details[count]
+
     def _flush(self, final: bool) -> None:
         seg = self.current
         if not seg:
             return
         seconds = seg["last"] - seg["start"]
         if seconds >= config.MIN_SEGMENT_SECONDS:
+            meta = {"exe": seg["exe"], "appKind": seg["kind"]}
+            if seg.get("parts"):
+                meta["parts"] = [[label, round(secs)] for label, secs in seg["parts"].values() if secs >= 1]
+            for key in ("words_start", "words_end", "slides_start", "slides_end"):
+                if key in seg:
+                    meta[key] = seg[key]
             self.app.db.upsert_event({
                 "key": f"win-{seg['start']:.3f}",
                 "kind": "app",
@@ -130,7 +159,7 @@ class WindowTracker(threading.Thread):
                 "seconds": seconds,
                 "title": seg["title"],
                 "app": seg["app"],
-                "meta": {"exe": seg["exe"], "appKind": seg["kind"]},
+                "meta": meta,
             })
         if final:
             self.current = None
@@ -159,7 +188,9 @@ class WindowTracker(threading.Thread):
                     self._flush(final=True)
                     continue
                 sig = (info["app"], info["title"])
+                details = self.office.details(info["app"], info["title"]) if info["kind"] == "office" else None
                 if self.current and self.current["sig"] == sig:
+                    self._add_details(self.current, details, now - self.current["last"])
                     self.current["last"] = now
                     if now - last_write > 30:
                         self._flush(final=False)
@@ -168,7 +199,8 @@ class WindowTracker(threading.Thread):
                     if self.current:
                         self.current["last"] = now
                     self._flush(final=True)
-                    self.current = {"sig": sig, "start": now, "last": now, **info}
+                    self.current = {"sig": sig, "start": now, "last": now, "parts": {}, **info}
+                    self._add_details(self.current, details, 0)
             except Exception:
                 log.exception("tracker poll failed")
         self._flush(final=True)

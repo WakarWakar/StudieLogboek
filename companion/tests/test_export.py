@@ -50,6 +50,39 @@ class ApaTests(unittest.TestCase):
         self.assertEqual(export._apa_author("Hamid Serraj"), "Serraj, H.")
 
 
+class OfficeTests(unittest.TestCase):
+    def test_word_description(self):
+        from studielogboek import office
+        meta = {"parts": [["5.1.2 Leerproces", 720], ["6. AI-gebruik", 180]], "words_start": 5000, "words_end": 5240}
+        self.assertEqual(office.describe("Word", meta),
+                         "schreef in ‘5.1.2 Leerproces’ (12 min), ‘6. AI-gebruik’ (3 min) · +240 woorden")
+
+    def test_powerpoint_description_and_merge(self):
+        from studielogboek import office
+        a = {"parts": [["dia 3 ‘Planning’", 300]], "slides_start": 8, "slides_end": 8}
+        b = {"parts": [["dia 3 ‘Planning’", 60], ["dia 9 ‘Vragen’", 240]], "slides_start": 8, "slides_end": 9}
+        m = office.merge_meta(a, b)
+        self.assertEqual(office.describe("PowerPoint", m),
+                         "maakte dia's en werkte aan dia 3 ‘Planning’ (6 min), dia 9 ‘Vragen’ (4 min) · 8 → 9 dia's")
+
+    def test_tracker_credits_time_to_the_current_part(self):
+        from studielogboek.tracker import WindowTracker
+        seg = {"parts": {}}
+        WindowTracker._add_details(seg, {"part": "Inleiding", "words": 100}, 0)
+        WindowTracker._add_details(seg, {"part": "Inleiding", "words": 120}, 5)
+        WindowTracker._add_details(seg, {"part": "Voorwoord", "words": 150}, 5)
+        WindowTracker._add_details(seg, None, 5)  # Word busy: time stays with the last heading
+        self.assertEqual(seg["parts"], {"Inleiding": ["Inleiding", 5], "Voorwoord": ["Voorwoord", 10]})
+        self.assertEqual((seg["words_start"], seg["words_end"]), (100, 150))
+
+    def test_slide_title_being_typed_is_one_entry(self):
+        from studielogboek.tracker import WindowTracker
+        seg = {"parts": {}}
+        for title, t in (("Intro", 0), ("Introcu", 5), ("Introductie Sinteg", 5)):
+            WindowTracker._add_details(seg, {"part": f"dia 3 ‘{title}’", "key": "dia 3", "slides": 15}, t)
+        self.assertEqual(list(seg["parts"].values()), [["dia 3 ‘Introductie Sinteg’", 10]])
+
+
 class WeekTests(unittest.TestCase):
     def test_week_numbers(self):
         self.assertEqual(config.internship_week(dt.date(2026, 8, 31)), 1)

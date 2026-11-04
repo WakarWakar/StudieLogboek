@@ -18,7 +18,7 @@ from docx.oxml.ns import qn
 from docx.shared import Cm, Pt, RGBColor
 from PIL import Image
 
-from . import config
+from . import config, office
 from .db import Database
 
 DAYS = ["maandag", "dinsdag", "woensdag", "donderdag", "vrijdag", "zaterdag", "zondag"]
@@ -301,6 +301,8 @@ def merge_activity(events: list[dict]) -> list[dict]:
             sig = (ev["kind"], _norm_url(ev.get("url")))
         if sig in rows:
             rows[sig]["seconds"] += ev.get("seconds") or 0
+            if ev["kind"] == "app":
+                rows[sig]["meta"] = office.merge_meta(rows[sig].get("meta") or {}, ev.get("meta") or {})
         else:
             rows[sig] = {**ev, "seconds": ev.get("seconds") or 0}
     return sorted(rows.values(), key=lambda r: r["start"])
@@ -427,6 +429,11 @@ class LogbookBuilder:
             if r["kind"] == "app":
                 self._cell(cells[1], r.get("app") or "Programma")
                 self._cell(cells[2], r.get("title") or "")
+                what = office.describe(r.get("app"), meta)
+                if what:
+                    p = cells[2].paragraphs[0]
+                    p.add_run().add_break()
+                    grey(p, what[0].upper() + what[1:])
             else:
                 self._cell(cells[1], KIND_LABEL.get(r["kind"], r["kind"]))
                 p = cells[2].paragraphs[0]
@@ -563,6 +570,13 @@ class LogbookBuilder:
             if app_rows:
                 self.bullet("; ".join(f"{r['app']} - {r['title'][:60]} ({dur(r['seconds'])})" for r in app_rows[:6]),
                             "Gewerkt in: ")
+                # one line per Office document: where in it you worked
+                for r in app_rows:
+                    what = office.describe(r["app"], r.get("meta") or {})
+                    if what and r["seconds"] >= 60:
+                        p = self.doc.add_paragraph(style="List Bullet 2")
+                        p.add_run(f"{r['title'][:60]}: ").italic = True
+                        p.add_run(what)
         placeholder(doc, "Vul aan: beschrijf in een paar zinnen wat je deze week hebt gedaan en waarom.")
 
         doc.add_heading("Wat heb ik geleerd", level=3)
