@@ -17,12 +17,9 @@ Firefox extension ──(127.0.0.1:5176)──▶ Studielogboek app (tray) ─�
    To start it automatically when you log in, double-click `autostart aanzetten.bat`.
 3. **Firefox extension.** Pick one:
    - **Quick (temporary, removed when Firefox closes):** open `about:debugging#/runtime/this-firefox` → *Load Temporary Add-on…* → choose `extension\manifest.json`.
-   - **Permanent, signed by Mozilla (recommended):** create a free account on [addons.mozilla.org](https://addons.mozilla.org/developers/) and generate API keys (*Tools → Manage API Keys*). Then run:
-     ```bash
-     cd extension
-     npx web-ext sign --channel=unlisted --api-key=YOUR_JWT_ISSUER --api-secret=YOUR_JWT_SECRET
-     ```
-     "Unlisted" means Mozilla signs it but doesn't publish it. Open the `.xpi` from `web-ext-artifacts\` in Firefox to install it for good.
+   - **Permanent, signed by Mozilla (recommended):** create a free account on [addons.mozilla.org](https://addons.mozilla.org/developers/) and generate API keys at [Manage API Keys](https://addons.mozilla.org/developers/addon/api/key/). Then double-click `extension ondertekenen.bat` and paste the two keys when it asks. The keys aren't saved anywhere.
+     "Unlisted" means Mozilla signs it but doesn't publish it. When it's done, drag the `.xpi` from `web-ext-artifacts\` onto a Firefox window and click *Toevoegen*. It then stays installed after restarts.
+     After changing the extension, raise `version` in `extension\manifest.json` and sign again.
    - **Permanent without signing:** use *Firefox Developer Edition* or *ESR*, set `xpinstall.signatures.required` to `false` in `about:config`, zip the contents of `extension\` into `studielogboek.xpi` and open it in Firefox.
 
    If the popup shows **"Toestemming geven"**, click it. Firefox needs your permission before the extension can see which pages you open.
