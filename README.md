@@ -10,7 +10,17 @@ Firefox extension ──(127.0.0.1:5176)──▶ Studielogboek app (tray) ─�
                                          └─ Ctrl+Alt+N note · Ctrl+Alt+S screenshot
 ```
 
-## Install (once)
+## Install on a new PC
+
+Windows only. You need [Python 3.10 or newer](https://www.python.org/downloads/). Tick *Add python.exe to PATH* in the installer.
+
+1. On this repository's GitHub page, click **Code → Download ZIP** and unzip it somewhere permanent, for example `Desktop\Studielogboek`. Or use `git clone`.
+2. Double-click `install.bat`, then `Studielogboek starten.vbs`.
+3. On the **Releases** page, download `studielogboek.xpi` and drag it onto a Firefox window → *Toevoegen*. This is the add-on, already signed by Mozilla.
+
+Your recorded data stays on each PC in `Documents\Studielogboek`. Copy that folder if you want to move your logbook to another PC.
+
+## Install (details)
 
 1. **App:** double-click `install.bat`. It creates a private Python environment in `.venv` and installs the dependencies.
 2. **Start:** double-click `Studielogboek starten.vbs`. A book icon appears in the system tray, next to the clock. It's grey when Study Mode is off and green when it's on.
@@ -91,3 +101,5 @@ cd companion && ../.venv/Scripts/python -m studielogboek export --week 10
 
 - `companion/studielogboek/`: `server.py` (local endpoint), `tracker.py` (foreground windows), `ui.py` (tray, note and screenshot dialogs, export dialog), `export.py` (Word + APA), `db.py`, `config.py` (week 1 date, thresholds, note types, competencies).
 - `extension/`: `background.js` (visit tracking, queue), `content/youtube.js` (watched seconds), `content/meta.js` (author/date for APA), `popup/`.
+
+Licence: MIT (see `LICENSE`). Free to use and change.
