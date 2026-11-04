@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header>
+    <h1>Studielogboek</h1>
+    <span id="conn" class="pill">...</span>
+  </header>
+
+  <label class="toggle">
+    <input type="checkbox" id="mode">
+    <span class="track"><span class="knob"></span></span>
+    <span id="modeText">Studiemodus uit</span>
+  </label>
+
+  <section id="perm" hidden>
+    <p>Studielogboek heeft toestemming nodig om pagina's te zien.</p>
+    <button id="grant">Toestemming geven</button>
+  </section>
+
+  <section id="pageBox">
+    <div class="label">Deze pagina</div>
+    <div id="pageTitle" class="title">-</div>
+    <div id="pageState" class="muted"></div>
+    <button id="exclude" class="link">Deze site nooit opslaan</button>
+  </section>
+
+  <footer class="muted">
+    <div><kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>N</kbd> snelle notitie &nbsp;·&nbsp; <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>S</kbd> screenshot</div>
+    <div id="queue"></div>
+  </footer>
+  <script src="popup.js"></script>
+</body>
+</html>
